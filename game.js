@@ -16,6 +16,7 @@ var die = new Audio('./resources/audio/die.mp3');
 var eat = new Audio('./resources/audio/eat.mp3');
 
 
+const FONT_NAME = '8bit';
 
 
 // Adding an event listener for key presses.
@@ -71,8 +72,11 @@ function spawnLocation(){
 function showScore(){
 
     ctx.textAlign = "center";
-    ctx.font = "20px Arial";
-    ctx.fillStyle = "white";
+    ctx.font = `20px "${FONT_NAME}"`;
+    var gradient = ctx.createLinearGradient(0, 0, canvas.width, 0);
+gradient.addColorStop("0.5", "blue");
+gradient.addColorStop("1.0", "red")
+    ctx.fillStyle = gradient;
     ctx.fillText("SCORE: " + score,width-90,30);
 
 }
@@ -81,8 +85,12 @@ function showScore(){
 function showPaused(){
 
     ctx.textAlign = "center";
-    ctx.font = "30px Arial";
-    ctx.fillStyle = "white";
+    ctx.font = `35px "${FONT_NAME}"`;
+    var gradient = ctx.createLinearGradient(0, 0, canvas.width, 0);
+    gradient.addColorStop("0", "white");
+    gradient.addColorStop("0.5", "green");
+    gradient.addColorStop("1.0", "blue")
+    ctx.fillStyle = gradient;
     ctx.fillText("PAUSED",width/2,height/2);
 
 }
@@ -231,7 +239,6 @@ class Food{
 
 // Initialization of the game objects.
 function init(){
-
     canvas = document.getElementById("game-area");
     canvas.width = width;
     canvas.height = height;
@@ -283,8 +290,6 @@ function update(){
         snake.draw();
         snake.move();
         showScore();
-
-
     }
 
 
@@ -304,3 +309,5 @@ function game(){
 }
 
 game();
+
+document.fonts.load('10pt "8bit"').then(game);

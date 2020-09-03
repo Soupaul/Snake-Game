@@ -1,22 +1,19 @@
 
 // Declaration of required global variables.
-const width = 600;
-const height = 800;
-var fps = 10;
-const tileSize = 20;
+let width;
+let height;
+let fps;
+let tileSize;
 let canvas;
 let ctx;
 let snake;
 let food;
 let score;
 let isPaused;
-let interval;
-var  fpsInterval, startTime, now, then, elapsed;
-var die = new Audio('./resources/audio/die.mp3');
-var eat = new Audio('./resources/audio/eat.mp3');
-
-
-const FONT_NAME = '8bit';
+let fpsInterval, startTime, now, then, elapsed;
+let die;
+let eat;
+let FONT_NAME;
 
 
 // Adding an event listener for key presses.
@@ -29,30 +26,47 @@ window.addEventListener("keydown",function(evt){
     }
     else if(evt.key === "ArrowUp"){
 
-        if(snake.velY != 1 && snake.x >=0 && snake.x<=width && snake.y>=0 && snake.y <=height)
+        if(snake.velY != 1 && snake.x >= 0 && snake.x <= width && snake.y >= 0 && snake.y <= height)
             snake.dir(0,-1);
 
     }
     else if(evt.key === "ArrowDown"){
 
-        if(snake.velY != -1 && snake.x >=0 && snake.x<=width && snake.y>=0 && snake.y <=height)
+        if(snake.velY != -1 && snake.x >= 0 && snake.x <= width && snake.y >= 0 && snake.y <= height)
             snake.dir(0,1);
 
     }
     else if(evt.key === "ArrowLeft"){
 
-        if(snake.velX != 1 && snake.x >=0 && snake.x<=width && snake.y>=0 && snake.y <=height)
+        if(snake.velX != 1 && snake.x >= 0 && snake.x <= width && snake.y >= 0 && snake.y <= height)
             snake.dir(-1,0);
 
     }
     else if(evt.key === "ArrowRight"){
 
-        if(snake.velX != -1 && snake.x >=0 && snake.x<=width && snake.y>=0 && snake.y <=height)
+        if(snake.velX != -1 && snake.x >= 0 && snake.x <= width && snake.y >= 0 && snake.y <= height)
             snake.dir(1,0);
 
     }
 
 });
+
+// Checks if food is spawned on the snake's body.
+function foodSnakeOverlap(pos){
+
+    if(snake.x == pos.x && snake.y == pos.y)
+        return true;
+
+    for(var i=0;i<snake.tail.length;i++){
+
+        if(snake.tail[i].x == pos.x && snake.tail[i].y == pos.y)
+            return true;
+
+    }
+
+    return false;
+
+}
 
 // Determining a random spawn location on the grid.
 function spawnLocation(){
@@ -61,8 +75,17 @@ function spawnLocation(){
     let rows = width/tileSize;
     let cols = height/tileSize;
 
-    let xPos = Math.floor(Math.random() * rows) * tileSize;
-    let yPos = Math.floor(Math.random() * cols) * tileSize;
+    let xPos, yPos;
+    let overlap = false;
+
+    // To prevent an overlap of the food and the snake's body.
+    do{
+
+        xPos = Math.floor(Math.random() * rows) * tileSize;
+        yPos = Math.floor(Math.random() * cols) * tileSize;
+        overlap = foodSnakeOverlap({x: xPos, y: yPos});
+
+    }while(overlap);
 
     return {x: xPos,y: yPos};
 
@@ -74,10 +97,10 @@ function showScore(){
     ctx.textAlign = "center";
     ctx.font = `20px "${FONT_NAME}"`;
     var gradient = ctx.createLinearGradient(0, 0, canvas.width, 0);
-gradient.addColorStop("0.5", "blue");
-gradient.addColorStop("1.0", "red")
+    gradient.addColorStop("0.5", "blue");
+    gradient.addColorStop("1.0", "red")
     ctx.fillStyle = gradient;
-    ctx.fillText("SCORE: " + score,width-90,30);
+    ctx.fillText("SCORE: " + score,width-120,30);
 
 }
 
@@ -175,7 +198,6 @@ class Snake{
             
             // Adding to the tail.
             this.tail.push({});
-            eat.play()
             return true;    
         }
 
@@ -186,14 +208,12 @@ class Snake{
     // Checking if the snake has died.
     die(){
 
-        
-
         for(var i=0;i<this.tail.length;i++){
+            
             if(Math.abs(this.x - this.tail[i].x) < tileSize && Math.abs(this.y - this.tail[i].y) < tileSize){
                 return true;
             }
                 
-
         }
 
         return false;
@@ -201,10 +221,13 @@ class Snake{
     }
 
     border(){
-        if(this.x + tileSize > width && this.velX!=-1 || this.x <  0 && this.velX !=1)
-            this.x= width-this.x 
-        else if(this.y + tileSize > height && this.velY!=-1 || this.velY!=1 &&this.y < 0)
-            this.y= height-this.y
+        
+        if(this.x + tileSize > width && this.velX != -1 || this.x <  0 && this.velX != 1)
+            this.x = width-this.x;
+        
+        else if(this.y + tileSize > height && this.velY != -1 || this.velY != 1 && this.y < 0)
+            this.y = height-this.y;
+    
     }
 
 }
@@ -239,69 +262,81 @@ class Food{
 
 // Initialization of the game objects.
 function init(){
+    
+    width = 600;
+    height = 800;
+    fps = 10;
+    tileSize = 20;
+    
+    then = Date.now();
+    startTime = then;
+    fpsInterval = 1000 / fps;
+
     canvas = document.getElementById("game-area");
     canvas.width = width;
     canvas.height = height;
     ctx = canvas.getContext("2d");
-
+    
+    FONT_NAME = '8bit';
+    eat = new Audio('./resources/audio/eat.mp3');
+    die = new Audio('./resources/audio/die.mp3');
     isPaused = false;
     score = 0;
-    snake = new Snake(spawnLocation(),"#39ff14");
+    snake = new Snake({x: width/2,y: height/2},"#39ff14");
     food = new Food(spawnLocation(),"red");
 
 }
 
 // Updating the position and redrawing of game objects.
 function update(){
+    
     requestAnimationFrame(update);
     now = Date.now();
     elapsed = now - then;
-    //console.log(fpsInterval)
+
     if (elapsed > fpsInterval) {
-        console.log(fpsInterval)
+       
         // Get ready for next frame by setting then=now, but also adjust for your
         // specified fpsInterval not being a multiple of RAF's interval (16.7ms)
         then = now - (elapsed % fpsInterval);
 
-        // Put your drawing code here
         // Checking if game is paused.
         if(isPaused){
             return;
         }
 
-        // Clearing the canvas for redrawing.
-        ctx.clearRect(0,0,width,height);
         if(snake.die()){
             die.play()
             alert("GAME OVER!!!");
             init();
             window.location.reload();
         }
+
         snake.border();
+        
         if(snake.eat()){
+            eat.play()
             score += 10;
             food = new Food(spawnLocation(),"red");
         }
 
-
-
+        // Clearing the canvas for redrawing.
+        ctx.clearRect(0,0,width,height);
 
         food.draw();
         snake.draw();
         snake.move();
         showScore();
+    
     }
-
 
 }
 
 // The actual game function.
 function game(){
-
-    then = Date.now();
-    startTime = then;
+    
     init();
-    fpsInterval = 1000 / fps;
+
     // The game loop.
     update();
 

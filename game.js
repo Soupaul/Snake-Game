@@ -2,7 +2,7 @@
 // Declaration of required global variables.
 const width = 600;
 const height = 800;
-const fps = 10;
+var fps = 10;
 const tileSize = 20;
 let canvas;
 let ctx;
@@ -12,11 +12,14 @@ let score;
 let isPaused;
 let interval;
 var  fpsInterval, startTime, now, then, elapsed;
+var die = new Audio('./resources/audio/die.mp3');
+var eat = new Audio('./resources/audio/eat.mp3');
+
+
 
 
 // Adding an event listener for key presses.
 window.addEventListener("keydown",function(evt){
-    console.log(evt.key)
     if(evt.key === " "){
 
         isPaused = !isPaused;
@@ -164,8 +167,8 @@ class Snake{
             
             // Adding to the tail.
             this.tail.push({});
-
-            return true;
+            eat.play()
+            return true;    
         }
 
         return false;
@@ -179,7 +182,6 @@ class Snake{
 
         for(var i=0;i<this.tail.length;i++){
             if(Math.abs(this.x - this.tail[i].x) < tileSize && Math.abs(this.y - this.tail[i].y) < tileSize){
-                console.log(i+ "  "+this.x+','+this.y,"     "+this.tail[i].x+","+this.tail[i].y)
                 return true;
             }
                 
@@ -235,7 +237,6 @@ function init(){
     canvas.width = width;
     canvas.height = height;
     ctx = canvas.getContext("2d");
-    console.log(canvas);
 
     isPaused = false;
     score = 0;
@@ -246,15 +247,12 @@ function init(){
 
 // Updating the position and redrawing of game objects.
 function update(){
-
-
     requestAnimationFrame(update);
     now = Date.now();
     elapsed = now - then;
-
-
+    //console.log(fpsInterval)
     if (elapsed > fpsInterval) {
-
+        console.log(fpsInterval)
         // Get ready for next frame by setting then=now, but also adjust for your
         // specified fpsInterval not being a multiple of RAF's interval (16.7ms)
         then = now - (elapsed % fpsInterval);
@@ -268,18 +266,15 @@ function update(){
         // Clearing the canvas for redrawing.
         ctx.clearRect(0,0,width,height);
         if(snake.die()){
-
+            die.play()
             alert("GAME OVER!!!");
             init();
             window.location.reload();
-
         }
         snake.border();
         if(snake.eat()){
-
             score += 10;
             food = new Food(spawnLocation(),"red");
-
         }
 
 
@@ -299,11 +294,10 @@ function update(){
 // The actual game function.
 function game(){
 
-    fpsInterval = 1000 / fps;
     then = Date.now();
     startTime = then;
     init();
-
+    fpsInterval = 1000 / fps;
     // The game loop.
     update();
 

@@ -11,10 +11,12 @@ let food;
 let score;
 let isPaused;
 let interval;
+var  fpsInterval, startTime, now, then, elapsed;
+
 
 // Adding an event listener for key presses.
 window.addEventListener("keydown",function(evt){
-
+    console.log(evt.key)
     if(evt.key === " "){
 
         isPaused = !isPaused;
@@ -23,25 +25,25 @@ window.addEventListener("keydown",function(evt){
     }
     else if(evt.key === "ArrowUp"){
 
-        if(snake.velY != 1)
+        if(snake.velY != 1 && snake.x >=0 && snake.x<=width && snake.y>=0 && snake.y <=height)
             snake.dir(0,-1);
 
     }
     else if(evt.key === "ArrowDown"){
 
-        if(snake.velY != -1)
+        if(snake.velY != -1&& snake.x >=0 && snake.x<=width && snake.y>=0 && snake.y <=height)
             snake.dir(0,1);
 
     }
     else if(evt.key === "ArrowLeft"){
 
-        if(snake.velX != 1)
+        if(snake.velX != 1&& snake.x >=0 && snake.x<=width && snake.y>=0 && snake.y <=height)
             snake.dir(-1,0);
 
     }
     else if(evt.key === "ArrowRight"){
 
-        if(snake.velX != -1)
+        if(snake.velX != -1&& snake.x >=0 && snake.x<=width && snake.y>=0 && snake.y <=height)
             snake.dir(1,0);
 
     }
@@ -174,21 +176,26 @@ class Snake{
     // Checking if the snake has died.
     die(){
 
-        if(this.x + tileSize > width || this.x < 0)
-            return true;
-
-        if(this.y + tileSize > height || this.y < 0)
-            return true;
+        
 
         for(var i=0;i<this.tail.length;i++){
-
-            if(Math.abs(this.x - this.tail[i].x) < tileSize && Math.abs(this.y - this.tail[i].y) < tileSize)
+            if(Math.abs(this.x - this.tail[i].x) < tileSize && Math.abs(this.y - this.tail[i].y) < tileSize){
+                console.log(i+ "  "+this.x+','+this.y,"     "+this.tail[i].x+","+this.tail[i].y)
                 return true;
+            }
+                
 
         }
 
         return false;
 
+    }
+
+    border(){
+        if(this.x + tileSize > width && this.velX!=-1|| this.x <  0 && this.velX !=1)
+            this.x= width-this.x 
+        else if(this.y + tileSize > height && this.velY!=-1 || this.velY!=1 &&this.y < 0)
+            this.y= height-this.y
     }
 
 }
@@ -241,43 +248,67 @@ function init(){
 // Updating the position and redrawing of game objects.
 function update(){
 
-    // Checking if game is paused.
-    if(isPaused){
-        return;
+ 
+
+
+    requestAnimationFrame(update);
+    now = Date.now();
+    elapsed = now - then;
+
+
+    if (elapsed > fpsInterval) {
+
+        // Get ready for next frame by setting then=now, but also adjust for your
+        // specified fpsInterval not being a multiple of RAF's interval (16.7ms)
+        then = now - (elapsed % fpsInterval);
+
+        // Put your drawing code here
+   // Checking if game is paused.
+   if(isPaused){
+    return;
+}
+
+// Clearing the canvas for redrawing.
+ctx.clearRect(0,0,width,height);
+if(snake.die()){
+
+    alert("GAME OVER!!!");
+    window.location.reload();
+    clearInterval(interval);
+
+}
+snake.border();
+if(snake.eat()){
+
+    score++;
+    food = new Food(spawnLocation(),"red");
+
+}
+
+
+
+
+food.draw();
+snake.draw();
+snake.move();
+showScore();
+
+
     }
 
-    // Clearing the canvas for redrawing.
-    ctx.clearRect(0,0,width,height);
-
-    if(snake.eat()){
-
-        score++;
-        food = new Food(spawnLocation(),"red");
-
-    }
-
-    if(snake.die()){
-
-        alert("GAME OVER!!!");
-        window.location.reload();
-        clearInterval(interval);
-
-    }
-
-    food.draw();
-    snake.draw();
-    snake.move();
-    showScore();
 
 }
 
 // The actual game function.
 function game(){
 
+    fpsInterval = 1000 / fps;
+    then = Date.now();
+    startTime = then;
     init();
 
     // The game loop.
-    interval = setInterval(update,1000/fps);
+    update();
 
 
 }

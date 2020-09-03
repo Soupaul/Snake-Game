@@ -232,7 +232,6 @@ class Food{
 // Initialization of the game objects.
 function init(){
 
-    window.resizeTo(500,500);
     canvas = document.getElementById("game-area");
     canvas.width = width;
     canvas.height = height;

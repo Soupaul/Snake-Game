@@ -31,19 +31,19 @@ window.addEventListener("keydown",function(evt){
     }
     else if(evt.key === "ArrowDown"){
 
-        if(snake.velY != -1&& snake.x >=0 && snake.x<=width && snake.y>=0 && snake.y <=height)
+        if(snake.velY != -1 && snake.x >=0 && snake.x<=width && snake.y>=0 && snake.y <=height)
             snake.dir(0,1);
 
     }
     else if(evt.key === "ArrowLeft"){
 
-        if(snake.velX != 1&& snake.x >=0 && snake.x<=width && snake.y>=0 && snake.y <=height)
+        if(snake.velX != 1 && snake.x >=0 && snake.x<=width && snake.y>=0 && snake.y <=height)
             snake.dir(-1,0);
 
     }
     else if(evt.key === "ArrowRight"){
 
-        if(snake.velX != -1&& snake.x >=0 && snake.x<=width && snake.y>=0 && snake.y <=height)
+        if(snake.velX != -1 && snake.x >=0 && snake.x<=width && snake.y>=0 && snake.y <=height)
             snake.dir(1,0);
 
     }
@@ -70,7 +70,7 @@ function showScore(){
     ctx.textAlign = "center";
     ctx.font = "20px Arial";
     ctx.fillStyle = "white";
-    ctx.fillText("SCORE: " + score,width-70,30);
+    ctx.fillText("SCORE: " + score,width-90,30);
 
 }
 
@@ -138,11 +138,10 @@ class Snake{
             this.tail[i] = this.tail[i-1];
 
         }
-        
+
         // Updating the start of the tail to acquire the position of head.
         if(this.tail.length != 0)
             this.tail[0] = {x: this.x, y: this.y};
-
 
         // Movement of the head.   
         this.x += this.velX * tileSize;
@@ -192,7 +191,7 @@ class Snake{
     }
 
     border(){
-        if(this.x + tileSize > width && this.velX!=-1|| this.x <  0 && this.velX !=1)
+        if(this.x + tileSize > width && this.velX!=-1 || this.x <  0 && this.velX !=1)
             this.x= width-this.x 
         else if(this.y + tileSize > height && this.velY!=-1 || this.velY!=1 &&this.y < 0)
             this.y= height-this.y
@@ -248,8 +247,6 @@ function init(){
 // Updating the position and redrawing of game objects.
 function update(){
 
- 
-
 
     requestAnimationFrame(update);
     now = Date.now();
@@ -263,35 +260,35 @@ function update(){
         then = now - (elapsed % fpsInterval);
 
         // Put your drawing code here
-   // Checking if game is paused.
-   if(isPaused){
-    return;
-}
+        // Checking if game is paused.
+        if(isPaused){
+            return;
+        }
 
-// Clearing the canvas for redrawing.
-ctx.clearRect(0,0,width,height);
-if(snake.die()){
+        // Clearing the canvas for redrawing.
+        ctx.clearRect(0,0,width,height);
+        if(snake.die()){
 
-    alert("GAME OVER!!!");
-    window.location.reload();
-    clearInterval(interval);
+            alert("GAME OVER!!!");
+            init();
+            window.location.reload();
 
-}
-snake.border();
-if(snake.eat()){
+        }
+        snake.border();
+        if(snake.eat()){
 
-    score++;
-    food = new Food(spawnLocation(),"red");
+            score += 10;
+            food = new Food(spawnLocation(),"red");
 
-}
-
-
+        }
 
 
-food.draw();
-snake.draw();
-snake.move();
-showScore();
+
+
+        food.draw();
+        snake.draw();
+        snake.move();
+        showScore();
 
 
     }

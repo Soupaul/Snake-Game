@@ -19,49 +19,45 @@ let FONT_NAME;
 // Adding an event listener for key presses.
 window.addEventListener("keydown",function(evt){
     if(evt.key === " "){
-
+        evt.preventDefault()
+        scrollTo(0,0)
         isPaused = !isPaused;
         showPaused();
-
     }
     else if(evt.key === "ArrowUp"){
-
+        evt.preventDefault()
+        scrollTo(0,0)
         if(snake.velY != 1 && snake.x >= 0 && snake.x <= width && snake.y >= 0 && snake.y <= height)
             snake.dir(0,-1);
-
     }
     else if(evt.key === "ArrowDown"){
-
+        evt.preventDefault()
+        scrollTo(0,0)
         if(snake.velY != -1 && snake.x >= 0 && snake.x <= width && snake.y >= 0 && snake.y <= height)
             snake.dir(0,1);
-
     }
     else if(evt.key === "ArrowLeft"){
-
+        evt.preventDefault()
+        scrollTo(0,0)
         if(snake.velX != 1 && snake.x >= 0 && snake.x <= width && snake.y >= 0 && snake.y <= height)
             snake.dir(-1,0);
-
     }
     else if(evt.key === "ArrowRight"){
-
+        evt.preventDefault()
+        scrollTo(0,0)
         if(snake.velX != -1 && snake.x >= 0 && snake.x <= width && snake.y >= 0 && snake.y <= height)
             snake.dir(1,0);
-
     }
 
 });
 
 // Checks if food is spawned on the snake's body.
 function foodSnakeOverlap(pos){
-
     if(snake.x == pos.x && snake.y == pos.y)
         return true;
-
     for(var i=0;i<snake.tail.length;i++){
-
         if(snake.tail[i].x == pos.x && snake.tail[i].y == pos.y)
             return true;
-
     }
 
     return false;
@@ -334,13 +330,9 @@ function update(){
 
 // The actual game function.
 function game(){
-    
     init();
-
     // The game loop.
     update();
-
-
 }
 
 game();

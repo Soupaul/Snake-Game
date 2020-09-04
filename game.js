@@ -16,35 +16,37 @@ let eat;
 let FONT_NAME;
 
 
+// Resizing the canvas on window resize
+window.addEventListener("resize",function(){
+
+    init();
+
+});
+
 // Adding an event listener for key presses.
 window.addEventListener("keydown",function(evt){
     if(evt.key === " "){
-        evt.preventDefault()
-        scrollTo(0,0)
+        evt.preventDefault();
         isPaused = !isPaused;
         showPaused();
     }
     else if(evt.key === "ArrowUp"){
-        evt.preventDefault()
-        scrollTo(0,0)
+        evt.preventDefault();
         if(snake.velY != 1 && snake.x >= 0 && snake.x <= width && snake.y >= 0 && snake.y <= height)
             snake.dir(0,-1);
     }
     else if(evt.key === "ArrowDown"){
-        evt.preventDefault()
-        scrollTo(0,0)
+        evt.preventDefault();
         if(snake.velY != -1 && snake.x >= 0 && snake.x <= width && snake.y >= 0 && snake.y <= height)
             snake.dir(0,1);
     }
     else if(evt.key === "ArrowLeft"){
-        evt.preventDefault()
-        scrollTo(0,0)
+        evt.preventDefault();
         if(snake.velX != 1 && snake.x >= 0 && snake.x <= width && snake.y >= 0 && snake.y <= height)
             snake.dir(-1,0);
     }
     else if(evt.key === "ArrowRight"){
-        evt.preventDefault()
-        scrollTo(0,0)
+        evt.preventDefault();
         if(snake.velX != -1 && snake.x >= 0 && snake.x <= width && snake.y >= 0 && snake.y <= height)
             snake.dir(1,0);
     }
@@ -92,7 +94,7 @@ function showScore(){
 
     ctx.textAlign = "center";
     ctx.font = `20px "${FONT_NAME}"`;
-    var gradient = ctx.createLinearGradient(0, 0, canvas.width, 0);
+    var gradient = ctx.createLinearGradient(0, 0, width, 0);
     gradient.addColorStop("0.5", "blue");
     gradient.addColorStop("1.0", "red")
     ctx.fillStyle = gradient;
@@ -105,7 +107,7 @@ function showPaused(){
 
     ctx.textAlign = "center";
     ctx.font = `35px "${FONT_NAME}"`;
-    var gradient = ctx.createLinearGradient(0, 0, canvas.width, 0);
+    var gradient = ctx.createLinearGradient(0, 0, width, 0);
     gradient.addColorStop("0", "white");
     gradient.addColorStop("0.5", "green");
     gradient.addColorStop("1.0", "blue")
@@ -122,7 +124,7 @@ class Snake{
 
         this.x = pos.x;
         this.y = pos.y;
-        this.tail = [];
+        this.tail = [{x: pos.x - tileSize,y: pos.y},{x: pos.x - tileSize*2,y: pos.y}];
         this.velX = 1;
         this.velY = 0;
         this.color = color;
@@ -259,10 +261,13 @@ class Food{
 // Initialization of the game objects.
 function init(){
     
-    width = 600;
-    height = 800;
-    fps = 10;
     tileSize = 20;
+    
+    // Dynamically controlling the size of canvas.
+    width = tileSize * Math.floor(window.innerWidth/tileSize);
+    height = tileSize * Math.floor(window.innerHeight/tileSize);;
+    
+    fps = 10;
     
     then = Date.now();
     startTime = then;
@@ -272,13 +277,14 @@ function init(){
     canvas.width = width;
     canvas.height = height;
     ctx = canvas.getContext("2d");
+    console.log(canvas);
     
     FONT_NAME = '8bit';
     eat = new Audio('./resources/audio/eat.mp3');
     die = new Audio('./resources/audio/die.mp3');
     isPaused = false;
     score = 0;
-    snake = new Snake({x: width/2,y: height/2},"#39ff14");
+    snake = new Snake({x: tileSize * Math.floor(width/(2*tileSize)),y: tileSize * Math.floor(height/(2*tileSize))},"#39ff14");
     food = new Food(spawnLocation(),"red");
 
 }
@@ -330,9 +336,12 @@ function update(){
 
 // The actual game function.
 function game(){
+    
     init();
+    
     // The game loop.
     update();
+
 }
 
 game();

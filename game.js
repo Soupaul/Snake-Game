@@ -14,6 +14,7 @@ let fpsInterval, startTime, now, then, elapsed;
 let die;
 let eat;
 let FONT_NAME;
+let animationFrame;
 
 
 // Loading the browser window
@@ -298,7 +299,7 @@ function init() {
 // Updating the position and redrawing of game objects.
 function update() {
 
-    requestAnimationFrame(update);
+    animationFrame = requestAnimationFrame(update);
     now = Date.now();
     elapsed = now - then;
 
@@ -316,7 +317,7 @@ function update() {
         if (snake.die()) {
             die.play()
             alert("GAME OVER!!!");
-            init();
+            cancelAnimationFrame(animationFrame);
             window.location.reload();
         }
 

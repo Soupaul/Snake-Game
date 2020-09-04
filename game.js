@@ -93,10 +93,9 @@ function spawnLocation(){
 function showScore(){
 
     ctx.textAlign = "center";
-    ctx.font = `20px "${FONT_NAME}"`;
+    ctx.font = `25px "${FONT_NAME}"`;
     var gradient = ctx.createLinearGradient(0, 0, width, 0);
-    gradient.addColorStop("0.5", "blue");
-    gradient.addColorStop("1.0", "red")
+    gradient.addColorStop("0.0" , "white")
     ctx.fillStyle = gradient;
     ctx.fillText("SCORE: " + score,width-120,30);
 

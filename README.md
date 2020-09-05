@@ -18,3 +18,5 @@ HTML and Vanilla JS.
  - Game audio from [Freesound](https://www.freesound.org)
 
  ### For the [GNU/Linux User's Group, NIT Durgapur](https://www.github.com/lugnitdgp).
+ 
+ **Improvements added to the game on the updated branch** [here](https://github.com/Soupaul/Snake-Game/tree/updated).

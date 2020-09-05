@@ -10,24 +10,13 @@ let snake;
 let food;
 let score;
 let isPaused;
-let fpsInterval, startTime, now, then, elapsed;
-let die;
-let eat;
-let FONT_NAME;
-let animationFrame;
+let interval;
 
 
 // Loading the browser window
 window.addEventListener("load",function(){
 
-    document.fonts.load('10pt "8bit"').then(game);
-
-});
-
-// Resizing the canvas on window resize
-window.addEventListener("resize", function () {
-
-    init();
+    game();
 
 });
 
@@ -61,19 +50,6 @@ window.addEventListener("keydown", function (evt) {
 
 });
 
-// Checks if food is spawned on the snake's body.
-function foodSnakeOverlap(pos) {
-    if (snake.x == pos.x && snake.y == pos.y)
-        return true;
-    for (var i = 0; i < snake.tail.length; i++) {
-        if (snake.tail[i].x == pos.x && snake.tail[i].y == pos.y)
-            return true;
-    }
-
-    return false;
-
-}
-
 // Determining a random spawn location on the grid.
 function spawnLocation() {
 
@@ -82,16 +58,9 @@ function spawnLocation() {
     let cols = height / tileSize;
 
     let xPos, yPos;
-    let overlap = false;
 
-    // To prevent an overlap of the food and the snake's body.
-    do {
-
-        xPos = Math.floor(Math.random() * rows) * tileSize;
-        yPos = Math.floor(Math.random() * cols) * tileSize;
-        overlap = foodSnakeOverlap({ x: xPos, y: yPos });
-
-    } while (overlap);
+    xPos = Math.floor(Math.random() * rows) * tileSize;
+    yPos = Math.floor(Math.random() * cols) * tileSize;
 
     return { x: xPos, y: yPos };
 
@@ -101,10 +70,8 @@ function spawnLocation() {
 function showScore() {
 
     ctx.textAlign = "center";
-    ctx.font = `25px "${FONT_NAME}"`;
-    var gradient = ctx.createLinearGradient(0, 0, width, 0);
-    gradient.addColorStop("0.0", "white")
-    ctx.fillStyle = gradient;
+    ctx.font = "25px Arial";
+    ctx.fillStyle = "white";
     ctx.fillText("SCORE: " + score, width - 120, 30);
 
 }
@@ -113,12 +80,8 @@ function showScore() {
 function showPaused() {
 
     ctx.textAlign = "center";
-    ctx.font = `35px "${FONT_NAME}"`;
-    var gradient = ctx.createLinearGradient(0, 0, width, 0);
-    gradient.addColorStop("0", "white");
-    gradient.addColorStop("0.5", "green");
-    gradient.addColorStop("1.0", "blue")
-    ctx.fillStyle = gradient;
+    ctx.font = "35px Arial";
+    ctx.fillStyle = "white";
     ctx.fillText("PAUSED", width / 2, height / 2);
 
 }
@@ -276,19 +239,11 @@ function init() {
 
     fps = 10;
 
-    then = Date.now();
-    startTime = then;
-    fpsInterval = 1000 / fps;
-
     canvas = document.getElementById("game-area");
     canvas.width = width;
     canvas.height = height;
     ctx = canvas.getContext("2d");
-    console.log(canvas);
 
-    FONT_NAME = '8bit';
-    eat = new Audio('./resources/audio/eat.mp3');
-    die = new Audio('./resources/audio/die.mp3');
     isPaused = false;
     score = 0;
     snake = new Snake({ x: tileSize * Math.floor(width / (2 * tileSize)), y: tileSize * Math.floor(height / (2 * tileSize)) }, "#39ff14");
@@ -299,45 +254,31 @@ function init() {
 // Updating the position and redrawing of game objects.
 function update() {
 
-    animationFrame = requestAnimationFrame(update);
-    now = Date.now();
-    elapsed = now - then;
-
-    if (elapsed > fpsInterval) {
-
-        // Get ready for next frame by setting then=now, but also adjust for your
-        // specified fpsInterval not being a multiple of RAF's interval (16.7ms)
-        then = now - (elapsed % fpsInterval);
-
-        // Checking if game is paused.
-        if (isPaused) {
-            return;
-        }
-
-        if (snake.die()) {
-            die.play()
-            alert("GAME OVER!!!");
-            cancelAnimationFrame(animationFrame);
-            window.location.reload();
-        }
-
-        snake.border();
-
-        if (snake.eat()) {
-            eat.play()
-            score += 10;
-            food = new Food(spawnLocation(), "red");
-        }
-
-        // Clearing the canvas for redrawing.
-        ctx.clearRect(0, 0, width, height);
-
-        food.draw();
-        snake.draw();
-        snake.move();
-        showScore();
-
+    // Checking if game is paused.
+    if (isPaused) {
+        return;
     }
+
+    if (snake.die()) {
+        alert("GAME OVER!!!");
+        clearInterval(interval);
+        window.location.reload();
+    }
+
+    snake.border();
+
+    if (snake.eat()) {
+        score += 10;
+        food = new Food(spawnLocation(), "red");
+    }
+
+    // Clearing the canvas for redrawing.
+    ctx.clearRect(0, 0, width, height);
+
+    food.draw();
+    snake.draw();
+    snake.move();
+    showScore();
 
 }
 
@@ -346,7 +287,6 @@ function game() {
 
     init();
 
-    // The game loop.
-    update();
+    interval = setInterval(update,1000/fps);
 
 }
